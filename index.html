@@ -902,7 +902,7 @@ html.mo .hero h1 em{animation:shim 7s ease-in-out infinite alternate}
 /* numbers that feel like numbers */
 .stats{gap:16px}
 .statbig{padding:30px 24px 26px;overflow:hidden;background:linear-gradient(160deg,var(--card) 55%,color-mix(in srgb,var(--c-ink) 9%,var(--card)))}
-.statbig b{font-size:clamp(40px,5.4vw,68px);letter-spacing:-.02em}
+.statbig b{font-size:clamp(32px,3.7vw,56px);letter-spacing:0}
 .statbig span{font-size:15.5px;line-height:1.6}
 
 /* ======================================================================
@@ -984,6 +984,33 @@ body.en h1,body.en h2{letter-spacing:-.02em}
 .nav{padding-inline:env(safe-area-inset-left,0px) env(safe-area-inset-right,0px);inset-block-start:calc(12px + env(safe-area-inset-top,0px))}
 @media (max-width:520px){.nav{inset-block-start:calc(8px + env(safe-area-inset-top,0px))}}
 footer{padding-bottom:calc(140px + env(safe-area-inset-bottom,0px))}
+
+/* ======================================================================
+   v3 · phone fixes from a real iPhone screenshot
+   ====================================================================== */
+/* stat cards: numbers sized to the card, labels wrap inside it */
+.statbig{min-width:0}
+.statbig b{white-space:nowrap;max-width:100%}
+.statbig span{min-width:0;overflow-wrap:anywhere}
+@media (max-width:760px){
+  .stats{gap:12px}
+  .statbig{padding:20px 16px 18px;border-radius:22px;align-content:start;gap:6px}
+  .statbig b{font-size:clamp(28px,8.6vw,38px);line-height:1.25;letter-spacing:0}
+  .statbig span{font-size:14.5px;line-height:1.65}
+}
+@media (max-width:360px){.statbig{padding:16px 12px}.statbig b{font-size:26px}.statbig span{font-size:13.5px}}
+/* progress segments live inside the glass bar, not hanging below it */
+.navprog{bottom:6px;inset-inline:26px;height:3px;border-radius:2px;overflow:hidden}
+@media (max-width:520px){.navprog{inset-inline:20px;bottom:5px}}
+/* on phones the dock already says what is next, so the in-page pill steps aside */
+@media (max-width:760px){body.dockOn .nextcue{display:none}.nextcue{margin-top:36px}}
+/* touch screens: no blur-in on headings (it janks on iOS), no hover-only effects */
+@media (hover:none){
+  html.mo main>section:not(.hero) .h2:not(.rv){filter:none}
+  .band .track{animation-duration:60s}
+}
+/* every card keeps its text inside, whatever the language or font size */
+.lstep,.pledge,.perks li,.dcard,.plan,.card{min-width:0;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -2283,7 +2310,7 @@ function navSpy() {
   $$('main > section').forEach(s => io.observe(s));
   window.paintDock = () => {
     const nx = G.done.indexOf(0), si = ST.findIndex(s => s.id === cur), hide = !cur || ['top', 'join', 'real', 'closet'].includes(cur) || nx < 0 || (si >= 0 && !G.done[si]);
-    dock.classList.toggle('away', hide); if (hide) return;
+    dock.classList.toggle('away', hide); document.body.classList.toggle('dockOn', !hide); if (hide) return;
     $('#dockTx').innerHTML = `<small>${tx(['ایستگاه بعدی', 'Next stop'])}، ${N(nx + 1)}/${N(9)}</small>${tx(ST[nx].n)}`; $('#dockGo').setAttribute('href', '#' + ST[nx].id);
   };
 }
@@ -2569,7 +2596,7 @@ function motionInit() {
     const nx = secs[i + 1], w = $(':scope > .wrap', s); let c = $('.nextcue', s);
     if (!nx || !w || s.id === 'top') { if (c) c.remove(); return }
     if (!c) { c = el('div', 'nextcue'); w.appendChild(c) }
-    c.innerHTML = `<a href="#${nx.id}"><span><small>${tx(['ادامه', 'Next'])}</small> ${label(nx)}</span><i>${ic('down', 18)}</i></a>`;
+    c.innerHTML = `<a href="#${nx.id}"><span><small>${tx(['بعدی:', 'Next:'])}</small> ${label(nx)}</span><i>${ic('down', 18)}</i></a>`;
   });
   motionInit.paint = () => { paint(); cues() }; paint(); cues();
 }
