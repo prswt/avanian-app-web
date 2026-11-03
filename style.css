@@ -642,6 +642,19 @@ a{-webkit-tap-highlight-color:transparent}
 /* phone browsers: 100vh counts the hidden address bar, so use the dynamic height where it exists */
 @supports (height:100dvh){.sheet{max-height:88dvh}@media (min-width:760px){.sheet{max-height:84dvh}}}
 
+/* ---------- portal to Avanian World (#land; the portal itself is ../portal/portal.css) ---------- */
+.gate{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--cg);row-gap:48px;align-items:center}
+.gate>.fcopy{grid-column:1/span 6}
+.gate>.gstage{grid-column:8/span 5;display:grid;place-items:center;padding-block:clamp(40px,6vw,72px)}
+.gate .aportal{--d:min(420px,78vw);max-width:80%}
+.gnote{font-size:15px;font-weight:700;color:var(--ink-2)}
+@media (max-width:900px){.gate>.fcopy,.gate>.gstage{grid-column:1/-1}.gate>.gstage{grid-row:1;padding-block:28px 8px}.gate>.fcopy{text-align:center;justify-items:center}}
+
+/* this page as the live view inside Avanian World's portal: no chrome, nothing to tap */
+html.in-portal .nav,html.in-portal .dock,html.in-portal .peek,html.in-portal .rail,html.in-portal .toast,html.in-portal .scrim,
+html.in-portal .tspot,html.in-portal .tcard,html.in-portal .tmark,html.in-portal .flycoin,html.in-portal .confetti{display:none!important}
+html.in-portal{scroll-behavior:auto}
+
 /* ======================================================================
    DESIGN v3: one calmer, bigger system on top of v2
    Apple HIG ideas, kept honest: glass only for the controls that float (nav, dock, chips),
@@ -1040,3 +1053,109 @@ html.mo .star{animation:twinkle 3.4s ease-in-out var(--d,0s) infinite}
 .peek .pb{background:var(--card);border-radius:20px;padding:12px 14px;font-weight:800;font-size:14.5px;line-height:1.7;color:var(--ink);box-shadow:var(--sh-2)}
 body.touring .peek{display:none}
 @media (prefers-reduced-motion:reduce){.star,.logo.dance .mk{animation:none}.peek{transition:opacity .3s;transform:none}}
+/* portal.css: the dreamy doorway between the Avanian website and Avanian World (shared by both builds).
+   .aportal is a round window with a live view of the other site, three swirling rings, a liquid sheen, a halo and motes drawn by portal.js.
+   Everything that moves all the time is a CSS animation of transform or opacity only, so it runs on the compositor and stays smooth. */
+.aportal{--d:min(440px,84vw);--sky:#BFE3EA;position:relative;display:block;width:var(--d);aspect-ratio:1;margin-inline:auto;border-radius:50%;
+  text-decoration:none;color:#241F2E;isolation:isolate;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none}
+.aportal .ap-float{position:absolute;inset:0;border-radius:50%;animation:apBob 8s cubic-bezier(.45,0,.55,1) infinite}
+/* the window itself is never scaled while the live view shows: a page from another site would be redrawn on every frame */
+.ap-r1,.ap-r2,.ap-r3,.ap-halo{transition:scale .9s cubic-bezier(.22,1,.36,1)}
+.aportal:hover .ap-r1,.aportal:hover .ap-r3,.aportal:focus-visible .ap-r1{scale:1.04}
+.aportal:hover .ap-r2,.aportal:hover .ap-halo{scale:1.08}
+@keyframes apBob{0%,100%{translate:0 0}50%{translate:0 -12px}}
+
+/* soft light around it */
+.ap-halo{position:absolute;inset:-26%;border-radius:50%;z-index:-1;pointer-events:none;will-change:transform,opacity;
+  background:radial-gradient(closest-side,rgba(255,255,255,.95),rgba(214,204,255,.7) 40%,rgba(223,127,165,.3) 62%,rgba(91,147,207,.12) 80%,rgba(91,147,207,0) 100%);
+  animation:apBreathe 6s cubic-bezier(.45,0,.55,1) infinite}
+.ap-halo2{inset:-40%;opacity:.55;background:radial-gradient(closest-side,rgba(242,197,61,.22),rgba(141,120,224,.16) 50%,transparent 100%);animation-duration:9s;animation-delay:-3s}
+@keyframes apBreathe{0%,100%{transform:scale(1);opacity:.75}50%{transform:scale(1.08);opacity:1}}
+
+/* rings: each one is drawn once and only turned (transform), never repainted */
+.ap-ring{position:absolute;border-radius:50%;pointer-events:none;will-change:transform;animation:apSpin var(--t,18s) linear infinite}
+.ap-r1{--t:16s;inset:-5%;
+  background:conic-gradient(#8D78E0,#DF7FA5,#F2C53D,#FFFFFF,#4FA37E,#5B93CF,#BFB1F5,#DF7FA5,#8D78E0);
+  -webkit-mask:radial-gradient(closest-side,transparent 88%,#000 90%,#000 95%,transparent 99.5%);
+          mask:radial-gradient(closest-side,transparent 88%,#000 90%,#000 95%,transparent 99.5%)}
+.ap-r2{--t:26s;inset:-14%;animation-direction:reverse;filter:blur(10px);opacity:.85;
+  background:conic-gradient(from 90deg,rgba(141,120,224,.95),rgba(242,197,61,.8),rgba(255,255,255,.25),rgba(91,147,207,.9),rgba(223,127,165,.85),rgba(79,163,126,.6),rgba(141,120,224,.95));
+  -webkit-mask:radial-gradient(closest-side,transparent 68%,#000 80%,#000 87%,transparent 100%);
+          mask:radial-gradient(closest-side,transparent 68%,#000 80%,#000 87%,transparent 100%)}
+/* spiral arms that sweep round the rim */
+.ap-r3{--t:9s;inset:-10%;filter:blur(2.5px);opacity:.9;
+  background:repeating-conic-gradient(from 0deg,rgba(255,255,255,0) 0deg,rgba(255,255,255,.95) 7deg,rgba(214,204,255,.6) 14deg,rgba(255,255,255,0) 30deg,rgba(255,255,255,0) 45deg);
+  -webkit-mask:radial-gradient(closest-side,transparent 82%,#000 88%,rgba(0,0,0,.4) 95%,transparent 100%);
+          mask:radial-gradient(closest-side,transparent 82%,#000 88%,rgba(0,0,0,.4) 95%,transparent 100%)}
+@keyframes apSpin{to{transform:rotate(360deg)}}
+
+/* the window with the other site inside */
+.ap-window{position:absolute;inset:0;border-radius:50%;overflow:hidden;background:var(--sky);-webkit-mask-image:radial-gradient(#fff,#000);transform:translateZ(0)}
+.ap-sky{position:absolute;inset:0;background:
+  radial-gradient(40% 26% at 30% 68%,rgba(255,255,255,.85),transparent 70%),
+  radial-gradient(34% 22% at 72% 38%,rgba(255,255,255,.7),transparent 70%),
+  radial-gradient(circle at 50% 40%,rgba(255,255,255,.5),transparent 60%),var(--sky)}
+.ap-window iframe{position:absolute;left:50%;top:50%;width:1000px;height:1000px;margin:-500px 0 0 -500px;border:0;pointer-events:none;background:var(--sky);
+  transform:scale(var(--s,.44));opacity:0;transition:opacity 1.6s ease}
+.ap-window iframe.on{opacity:1}
+/* a vortex of light: what the window turns into while stepping through (and coming out) */
+.ap-vortex{position:absolute;inset:-30%;opacity:0;transition:opacity .45s ease;pointer-events:none}
+.ap-vortex i{position:absolute;inset:0;border-radius:50%;will-change:transform;animation:apSpin 2.2s linear infinite;
+  background:radial-gradient(closest-side,#fff 0,rgba(255,255,255,.96) 20%,rgba(255,255,255,.35) 48%,rgba(255,255,255,0) 70%),
+    conic-gradient(#D6CCFF,#FFFFFF 12%,#F9D3E3 25%,#FFFFFF 37%,#CDEBF1 50%,#FFFFFF 62%,#FCEBB8 75%,#FFFFFF 87%,#D6CCFF)}
+.ap-vortex i+i{animation-duration:3.4s;animation-direction:reverse;opacity:.5;
+  background:radial-gradient(closest-side,transparent 30%,rgba(255,255,255,.8) 75%,transparent 100%),
+    conic-gradient(from 45deg,rgba(141,120,224,.35),rgba(255,255,255,0) 20%,rgba(223,127,165,.3) 40%,rgba(255,255,255,0) 60%,rgba(91,147,207,.3) 80%,rgba(141,120,224,.35))}
+.aportal.ap-vortexing .ap-vortex{opacity:1}
+.aportal.ap-vortexing .ap-window iframe{opacity:0;transition:opacity .3s ease}
+.ap-view{position:absolute;inset:0;will-change:transform}
+/* liquid sheen turning slowly over the view */
+.ap-sheen{position:absolute;inset:-25%;pointer-events:none;mix-blend-mode:screen;opacity:.55;will-change:transform;animation:apSpin 30s linear infinite;
+  background:repeating-conic-gradient(from 0deg,rgba(255,255,255,0) 0deg,rgba(255,255,255,.35) 18deg,rgba(214,204,255,.0) 40deg,rgba(255,255,255,0) 60deg);
+  -webkit-mask:radial-gradient(closest-side,transparent 30%,#000 75%);mask:radial-gradient(closest-side,transparent 30%,#000 75%)}
+.ap-glass{position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,transparent 58%,rgba(141,120,224,.2) 80%,rgba(255,255,255,.85) 100%),
+             radial-gradient(55% 38% at 34% 18%,rgba(255,255,255,.5),transparent 70%)}
+.ap-rim{position:absolute;inset:0;border-radius:50%;pointer-events:none;will-change:opacity;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.9),inset 0 0 26px 6px rgba(141,120,224,.55),inset 0 0 60px 10px rgba(223,127,165,.22);
+  animation:apRim 4.5s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes apRim{0%,100%{opacity:.7}50%{opacity:1}}
+.ap-ripple{position:absolute;inset:0;border-radius:50%;pointer-events:none}
+.ap-ripple::before,.ap-ripple::after{content:"";position:absolute;inset:4%;border-radius:50%;border:1.5px solid rgba(255,255,255,.75);opacity:0;will-change:transform,opacity;
+  animation:apRipple 5s cubic-bezier(.3,0,.4,1) infinite}
+.ap-ripple::after{animation-delay:2.5s}
+@keyframes apRipple{0%{transform:scale(1.05);opacity:0}25%{opacity:.7}100%{transform:scale(.5);opacity:0}}
+.ap-motes{position:absolute;inset:-35%;width:170%;height:170%;pointer-events:none}
+
+.ap-label{position:absolute;left:50%;bottom:-4%;translate:-50% 0;z-index:2;direction:rtl;white-space:nowrap;
+  font-family:'Koodak',Tahoma,sans-serif;font-weight:900;font-size:clamp(15px,1.5vw,18px);line-height:1;padding:11px 20px 12px;border-radius:999px;
+  background:rgba(255,253,248,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.9),0 6px 22px rgba(57,43,130,.16);
+  transition:translate .6s cubic-bezier(.22,1,.36,1),opacity .4s}
+.ap-label::before{content:"";display:inline-block;width:8px;height:8px;margin-inline-end:9px;vertical-align:2px;border-radius:50%;background:#8D78E0;box-shadow:0 0 0 4px rgba(141,120,224,.22);animation:apDot 1.8s ease-in-out infinite}
+@keyframes apDot{50%{box-shadow:0 0 0 8px rgba(141,120,224,0)}}
+.aportal:hover .ap-label,.aportal:focus-visible .ap-label{translate:-50% -5px}
+.aportal:focus-visible .ap-window{box-shadow:inset 0 0 0 4px #8D78E0}
+.aportal.ap-noview .ap-window iframe{display:none}
+.aportal.ap-going .ap-label{opacity:0}
+/* frosted glass on the page being zoomed would be re-blurred at a huge size on every frame */
+.ap-diving,.ap-diving *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+/* as the zoom starts the portal opens up into pure light: everything but the vortex fades, because each of these layers would be
+   redrawn at the huge zoomed size on every frame (the streaks drawn by portal.js carry the motion from here) */
+.aportal.ap-going :is(.ap-ring,.ap-halo,.ap-motes,.ap-sky,.ap-sheen,.ap-glass,.ap-rim,.ap-ripple){opacity:0!important;transition:opacity .4s ease .45s}
+.aportal.ap-going .ap-window{-webkit-mask-image:none}
+/* nothing moves while the portal is off screen */
+.aportal.ap-idle *,.aportal.ap-idle *::before,.aportal.ap-idle *::after{animation-play-state:paused!important}
+
+/* stepping through: the page dives into the portal, motes rush past, and everything blooms into soft light.
+   The next page starts from the very same light (html.portal-arrive), so the hand-over between the two pages can't be seen. */
+.ap-warp{position:fixed;inset:0;z-index:2147483647;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at var(--cx,50%) var(--cy,50%),#FFFFFF 0,#FBF8FF 22%,#EEE7FF 48%,#DCD1FB 78%,#CBBDF5 100%)}
+.ap-warp em{position:absolute;left:50%;top:50%;translate:-50% -50%;font-style:normal;font-family:'Koodak',Tahoma,sans-serif;font-weight:900;
+  font-size:clamp(28px,5vw,54px);color:#392B82;white-space:nowrap;opacity:0;direction:rtl}
+.ap-streaks{position:fixed;inset:0;width:100vw;height:100vh;z-index:2147483646;pointer-events:none}
+html.portal-arrive::before{content:"";position:fixed;inset:0;z-index:2147483647;
+  background:radial-gradient(circle at 50% 50%,#FFFFFF 0,#FBF8FF 22%,#EEE7FF 48%,#DCD1FB 78%,#CBBDF5 100%)}
+
+@media (prefers-reduced-motion:reduce){
+  .aportal .ap-float,.ap-halo,.ap-ring,.ap-sheen,.ap-rim,.ap-ripple::before,.ap-ripple::after,.ap-label::before{animation:none}
+}

@@ -1186,8 +1186,8 @@ const choose = () => {
     else if (e.key === (L ? 'ArrowLeft' : 'ArrowRight') && at > 0) show(at - 1);
   });
   $('#tourBtn').addEventListener('click', () => { pop(); open(at >= 0 ? at : 0) });
-  // offer it once, a moment after the first visit lands on the hero
-  if (!store.get('tourSeen', 0) && scrollY < 200) offerT = setTimeout(() => { if (scrollY < 400 && !$('.scrim')) open(0) }, 2200);
+  // offer it once, a moment after the first visit lands on the hero (never inside Avanian World's portal, or right after stepping through one)
+  if (!store.get('tourSeen', 0) && scrollY < 200 && !/[?&](portal|via)=/.test(location.search)) offerT = setTimeout(() => { if (scrollY < 400 && !$('.scrim')) open(0) }, 2200);
   tourInit.paint = () => { if (at >= 0) { paint(); frame() } };
 }
 

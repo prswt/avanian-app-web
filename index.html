@@ -12,6 +12,7 @@
 <meta name="apple-mobile-web-app-title" content="آوانیان">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap"></noscript>
 <link rel="stylesheet" href="style.css">
+<script src="portal.js"></script>
 </head>
 <body>
 <header class="nav" id="nav">
@@ -364,6 +365,24 @@
    <div class="ladder" id="jladder"></div>
   </div>
   <div class="jcard" id="jcard" aria-live="polite"></div>
+ </div>
+</section>
+
+<!-- PORTAL: a live window into Avanian World (../portal/); the land has a portal back to this section -->
+<section class="tint-sky" id="land">
+ <div class="wrap gate">
+  <div class="fcopy">
+   <span class="eyebrow"><i data-ic="sparkle"></i><span data-en="A doorway">یک دریچه</span></span>
+   <h2 class="h2" data-en="See Avanian Land from here">سرزمین آوانیان را از همین‌جا ببینید</h2>
+   <p class="lead" data-en="Behind this doorway is Avanian Land. Its islands float on the clouds, and Zaniyar the owl is waiting there for you. Tap the doorway to step in.">پشت این دریچه سرزمین آوانیان است. جزیره‌هایش روی ابرها شناورند و زانیار، جغد سرزمین، آنجا منتظر شماست. روی دریچه بزنید و واردش شوید.</p>
+   <div><button class="btn" data-portal-go><i data-ic="sparkle"></i><span data-en="Step into the land">وارد سرزمین شوید</span></button></div>
+   <p class="gnote" data-en="The land has a doorway back here too.">در سرزمین هم دریچه‌ای هست که شما را به همین‌جا برمی‌گرداند.</p>
+  </div>
+  <div class="gstage">
+   <a class="aportal" href="https://prswt.github.io/avanian-world-live/#portal" data-view="https://prswt.github.io/avanian-world-live/?portal=1"
+      data-local-href="/03%20-%20Website%20%26%20marketing/avanian-world/Avanian-World.html#portal" data-local-view="http://localhost:8765/03%20-%20Website%20%26%20marketing/avanian-world/Avanian-World.html?portal=1"
+      data-name="سرزمین آوانیان" aria-label="دریچه‌ای به سرزمین آوانیان"><span class="ap-label" data-en="Avanian Land">سرزمین آوانیان</span></a>
+  </div>
  </div>
 </section>
 </main>
