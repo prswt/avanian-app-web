@@ -1108,6 +1108,10 @@ body.touring .peek{display:none}
     conic-gradient(from 45deg,rgba(141,120,224,.35),rgba(255,255,255,0) 20%,rgba(223,127,165,.3) 40%,rgba(255,255,255,0) 60%,rgba(91,147,207,.3) 80%,rgba(141,120,224,.35))}
 .aportal.ap-vortexing .ap-vortex{opacity:1}
 .aportal.ap-vortexing .ap-window iframe{opacity:0;transition:opacity .3s ease}
+/* phones: a still picture of the other site drifts slowly down and back up inside the window */
+.ap-still{position:absolute;left:0;top:0;width:100%;height:auto;will-change:transform;animation:apDrift 70s cubic-bezier(.45,0,.55,1) infinite;transition:opacity .3s ease}
+@keyframes apDrift{0%,8%{transform:translateY(0)}50%,58%{transform:translateY(-58.3%)}100%{transform:translateY(0)}}
+.aportal.ap-vortexing .ap-still{opacity:0}
 .ap-view{position:absolute;inset:0;will-change:transform}
 /* liquid sheen turning slowly over the view */
 .ap-sheen{position:absolute;inset:-25%;pointer-events:none;mix-blend-mode:screen;opacity:.55;will-change:transform;animation:apSpin 30s linear infinite;
@@ -1157,5 +1161,5 @@ html.portal-arrive::before{content:"";position:fixed;inset:0;z-index:2147483647;
   background:radial-gradient(circle at 50% 50%,#FFFFFF 0,#FBF8FF 22%,#EEE7FF 48%,#DCD1FB 78%,#CBBDF5 100%)}
 
 @media (prefers-reduced-motion:reduce){
-  .aportal .ap-float,.ap-halo,.ap-ring,.ap-sheen,.ap-rim,.ap-ripple::before,.ap-ripple::after,.ap-label::before{animation:none}
+  .aportal .ap-float,.ap-halo,.ap-ring,.ap-still,.ap-sheen,.ap-rim,.ap-ripple::before,.ap-ripple::after,.ap-label::before{animation:none}
 }

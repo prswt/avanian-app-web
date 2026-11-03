@@ -2,6 +2,8 @@
    Markup: <a class="aportal" href="(page to step into)" data-view="(page shown live inside)" data-name="(name shown while stepping through)">
              <span class="ap-label">…</span></a>
    data-local-href / data-local-view are used instead when the page is opened from a local server (testing).
+   data-still is a picture of the other site: phones show it, slowly drifting, instead of the live view, and step through with a light
+   circle instead of zooming the page (a second live site and a full-page zoom layer use more memory than an iPhone allows).
    Any element with data-portal-go="(selector, default .aportal)" steps through that portal when clicked; window.AvPortal.go(el) does the same.
    It runs in <head> so a visitor who arrives through a portal sees the light before the page paints.
    ?portal=1 means this page is the live view inside the other site's portal: it hides its own chrome and drifts slowly down and up.
@@ -14,6 +16,8 @@
   var ARRIVE = !INSIDE && /[?&]via=portal(&|$)/.test(qs);
   var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  var LITE = matchMedia('(pointer: coarse)').matches || innerWidth < 820 || (navigator.deviceMemory && navigator.deviceMemory <= 4) ||
+    /iP(hone|ad|od)/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
   var V = 1000;                                   // the page inside is laid out at 1000 × 1000 px, then scaled down to the window
   var COLORS = ['#8D78E0', '#DF7FA5', '#F2C53D', '#4FA37E', '#5B93CF', '#FFFFFF', '#BFB1F5'];
   var DIVE = 'cubic-bezier(.75,0,.9,.4)', OUT = 'cubic-bezier(.16,1,.3,1)';
@@ -37,8 +41,10 @@
     mk('span', 'ap-halo ap-halo2', fl); mk('span', 'ap-halo', fl);
     var win = mk('span', 'ap-window', fl);
     mk('span', 'ap-sky', win);
-    var vw = mk('span', 'ap-view', win), fr = null;
-    if (INSIDE || !view) el.classList.add('ap-noview');
+    var vw = mk('span', 'ap-view', win), fr = null, still = el.getAttribute('data-still');
+    if (LITE) el.classList.add('ap-lite');
+    if (LITE && still && !INSIDE) { var im = mk('img', 'ap-still', vw); im.alt = ''; im.decoding = 'async'; im.src = still }
+    if (INSIDE || !view || LITE) el.classList.add('ap-noview');
     else {
       fr = mk('iframe', '', vw);
       fr.title = el.getAttribute('data-name') || ''; fr.tabIndex = -1;
@@ -107,7 +113,7 @@
     st.wake = function () { if (!st.raf && !RM) { st.last = 0; st.raf = requestAnimationFrame(tick) } };
     function show(on) {
       st.vis = on; el.classList.toggle('ap-idle', !on);
-      if (!going && !RM) sceneOf(el).style.willChange = on ? 'transform' : '';   // ready for the dive, so starting it costs nothing
+      if (!going && !RM && !LITE) sceneOf(el).style.willChange = on ? 'transform' : '';   // ready for the dive, so starting it costs nothing
       if (on) st.wake();
       if (RM && on) { size(); tick(performance.now()) }   // reduced motion: one still frame
     }
@@ -138,6 +144,7 @@
     if (!r || !r.width || r.bottom < 0 || r.top > innerHeight) return null;
     return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r.width / 2 };
   }
+  function circle(r, c) { return 'circle(' + r.toFixed(1) + 'px at ' + c.x.toFixed(1) + 'px ' + c.y.toFixed(1) + 'px)' }
   function far(c) { return Math.hypot(Math.max(c.x, innerWidth - c.x), Math.max(c.y, innerHeight - c.y)) }
   function aim(scene, c) {          // zoom the scene around the portal's centre; returns the scale at which the window covers the screen
     var r = scene.getBoundingClientRect();
@@ -192,6 +199,7 @@
       setTimeout(function () { location.href = dest }, 380); return;
     }
     if (st) { st.tx = st.ty = 0; st.want = 1; st.boost = 7; st.wake() }
+    if (LITE) { goLite(el, c, dest); return }
     // 1. the live view melts into a vortex of light, then the portal draws a breath
     vortex(el, true);
     st.fl.animate([{ scale: 1 }, { scale: .94, offset: .45 }, { scale: 1.06 }], { duration: 420, delay: 330, easing: 'cubic-bezier(.45,0,.2,1)', fill: 'forwards' });
@@ -212,6 +220,20 @@
     setTimeout(function () { location.href = dest }, 2100);
   }
 
+  // phones: no page zoom; a circle of light grows out of the portal and fills the screen
+  function goLite(el, c, dest) {
+    vortex(el, true);
+    el._st.fl.animate([{ scale: 1 }, { scale: .94, offset: .45 }, { scale: 1.06 }], { duration: 420, delay: 250, easing: 'cubic-bezier(.45,0,.2,1)', fill: 'forwards' });
+    var ov = overlay(c, el.getAttribute('data-name'));
+    ov.style.clipPath = circle(c.r, c);
+    ov.animate([{ clipPath: circle(c.r * .9, c), opacity: 0 }, { clipPath: circle(c.r, c), opacity: 1, offset: .25 }, { clipPath: circle(far(c) + 4, c), opacity: 1 }],
+      { duration: 1250, delay: 380, easing: 'cubic-bezier(.65,0,.3,1)', fill: 'forwards' });
+    setTimeout(function () { streaks(c, 1100, false) }, 650);
+    var em = ov.querySelector('em');
+    if (em) em.animate([{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: 1250, easing: OUT, fill: 'forwards' });
+    setTimeout(function () { location.href = dest }, 1850);
+  }
+
   /* ---------- arriving: the page comes out of its own portal ---------- */
   function arrive() {
     try { var u = new URL(location.href); u.searchParams.delete('via'); history.replaceState(history.state, '', u.pathname + u.search + u.hash) } catch (e) {}
@@ -225,6 +247,15 @@
       var p = document.querySelector('.aportal');
       if (p) p.scrollIntoView({ block: 'center', behavior: 'instant' });   // the page may still have been settling when it jumped to its portal
       var c = centre(p);
+      if (p && c && p._st && LITE) {
+        p._st.rate = 8; p._st.want = 1; p._st.wake();
+        p.classList.add('ap-vortexing'); setTimeout(function () { p.classList.remove('ap-vortexing') }, 1300);
+        ov.style.setProperty('--cx', c.x + 'px'); ov.style.setProperty('--cy', c.y + 'px');
+        streaks(c, 1000, true);
+        ov.animate([{ clipPath: circle(far(c) + 4, c), opacity: 1 }, { clipPath: circle(c.r, c), opacity: 1, offset: .8 }, { clipPath: circle(c.r * .9, c), opacity: 0 }],
+          { duration: 1300, easing: 'cubic-bezier(.5,0,.2,1)', fill: 'forwards' }).onfinish = function () { ov.remove(); release() };
+        return;
+      }
       if (p && c && p._st) {
         var st = p._st, scene = sceneOf(p), S = Math.min(2.2, aim(scene, c));   // a gentle start: the light hides the first part anyway
         st.rate = 8; st.boost = 0; st.want = 1; st.wake();
