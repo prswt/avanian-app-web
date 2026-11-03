@@ -238,9 +238,10 @@
       else setTimeout(release, 900);
       ov.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1000, easing: 'cubic-bezier(.3,0,.2,1)', fill: 'forwards' }).onfinish = function () { ov.remove() };
     }
-    var t0 = performance.now();
-    function ready() { setTimeout(start, Math.max(0, 450 - (performance.now() - t0))) }
-    if (document.readyState === 'complete') ready(); else addEventListener('load', ready, { once: true });
+    // start once the page has loaded, but never keep the visitor waiting on a slow outside file (e.g. a web font that is blocked)
+    var t0 = performance.now(), begun = false;
+    function ready() { if (begun) return; begun = true; setTimeout(start, Math.max(0, 450 - (performance.now() - t0))) }
+    if (document.readyState === 'complete') ready(); else { addEventListener('load', ready, { once: true }); setTimeout(ready, 1200) }
   }
 
   /* ---------- the live view inside the other site's portal drifts slowly down the page and back up ---------- */
